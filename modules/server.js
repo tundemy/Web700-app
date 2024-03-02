@@ -1,31 +1,30 @@
-// server.js
-
-// Import required modules
 const express = require("express");
 const bodyParser = require("body-parser");
 const path = require("path");
 const collegeData = require("./collegeData");
 
-// Create Express app
 const app = express();
 const HTTP_PORT = process.env.PORT || 8080;
-app.set('view engine', 'ejs');
-app.set('views', path.join(__dirname, 'views'));
 
-// Configure body-parser middleware
-app.use(bodyParser.urlencoded({ extended: true }));
+// Set EJS as the view engine
+app.set('view engine', 'ejs');
+
+// Set the views directory
+app.set('views', path.join(__dirname, 'views'));
 
 // Serve static files from the 'public' directory
 app.use(express.static("public"));
+app.use(bodyParser.urlencoded({ extended: true })); // Add body-parser middleware
 
-// Define routes
 // Routes for API endpoints
 app.get("/students", (req, res) => {
     collegeData.getAllStudents()
         .then((students) => {
+            // Render student list page
             res.render("students", { students });
         })
         .catch((err) => {
+            // Handle error
             console.error("Error getting students:", err);
             res.status(500).send("Internal Server Error");
         });
@@ -49,13 +48,13 @@ app.get("/students/add", (req, res) => {
 });
 
 app.post("/students/add", (req, res) => {
-    console.log("Form Data:", req.body); // Log form data for debugging
     collegeData.addStudent(req.body)
         .then(() => {
             res.redirect("/students");
         })
         .catch((err) => {
-            console.error("Error:", err);
+            // Handle error
+            console.error("Error adding student:", err);
             res.status(500).send("Internal Server Error");
         });
 });
