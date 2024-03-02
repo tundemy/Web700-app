@@ -1,50 +1,37 @@
+// server.js
+
+// Import required modules
 const express = require("express");
+const bodyParser = require("body-parser");
 const path = require("path");
 const collegeData = require("./collegeData");
 
+// Create Express app
 const app = express();
 const HTTP_PORT = process.env.PORT || 8080;
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views'));
 
+// Configure body-parser middleware
+app.use(bodyParser.urlencoded({ extended: true }));
+
+// Serve static files from the 'public' directory
 app.use(express.static("public"));
 
-// Route to get all students with optional course filter
+// Define routes
+// Routes for API endpoints
 app.get("/students", (req, res) => {
-    const { course } = req.query;
-
-    if (course) {
-        collegeData.getStudentsByCourse(course)
-            .then(students => res.json(students))
-            .catch(() => res.status(404).json({ message: "no results" }));
-    } else {
-        collegeData.getAllStudents()
-            .then(students => res.json(students))
-            .catch(() => res.status(404).json({ message: "no results" }));
-    }
+    collegeData.getAllStudents()
+        .then((students) => {
+            res.render("students", { students });
+        })
+        .catch((err) => {
+            console.error("Error getting students:", err);
+            res.status(500).send("Internal Server Error");
+        });
 });
 
-// Route to get all TAs
-app.get("/tas", (req, res) => {
-    collegeData.getTAs()
-        .then(tas => res.json(tas))
-        .catch(() => res.status(404).json({ message: "no results" }));
-});
-
-// Route to get all courses
-app.get("/courses", (req, res) => {
-    collegeData.getCourses()
-        .then(courses => res.json(courses))
-        .catch(() => res.status(404).json({ message: "no results" }));
-});
-
-// Route to get a single student by student number
-app.get("/student/:num", (req, res) => {
-    const num = parseInt(req.params.num);
-    collegeData.getStudentByNum(num)
-        .then(student => res.json(student))
-        .catch(() => res.status(404).json({ message: "no results" }));
-});
-
-// Route to serve HTML files
+// Routes to serve HTML files
 app.get("/", (req, res) => {
     res.sendFile(path.join(__dirname, "views", "home.html"));
 });
@@ -55,6 +42,22 @@ app.get("/about", (req, res) => {
 
 app.get("/htmlDemo", (req, res) => {
     res.sendFile(path.join(__dirname, "views", "htmlDemo.html"));
+});
+
+app.get("/students/add", (req, res) => {
+    res.sendFile(path.join(__dirname, "views", "addStudent.html"));
+});
+
+app.post("/students/add", (req, res) => {
+    console.log("Form Data:", req.body); // Log form data for debugging
+    collegeData.addStudent(req.body)
+        .then(() => {
+            res.redirect("/students");
+        })
+        .catch((err) => {
+            console.error("Error:", err);
+            res.status(500).send("Internal Server Error");
+        });
 });
 
 // Handling unmatched routes
