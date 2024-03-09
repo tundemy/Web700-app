@@ -1,3 +1,14 @@
+/*********************************************************************************
+*  WEB700 – Assignment 04
+*  I declare that this assignment is my own work in accordance with Seneca  Academic Policy.  No part 
+*  of this assignment has been copied manually or electronically from any other source 
+*  (including 3rd party web sites) or distributed to other students.
+* 
+*  Name:Titilope Orukotan Student ID: 128275237 Date: 03/09/2024
+*
+*  Online (Cycliic) Link:  https://uninterested-lime-buckle.cyclic.app
+********************************************************************************/ 
+
 const express = require("express");
 const bodyParser = require("body-parser");
 const path = require("path");
